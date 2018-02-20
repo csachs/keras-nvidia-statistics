@@ -23,7 +23,7 @@ from keras_nvidia_statistics import NvidiaDeviceStatistics
 
 # ...
 
-model.fit(X, Y, callbacks=[NvidiaDeviceStatistics()])
+model.fit(X, Y, callbacks=[NvidiaDeviceStatistics(), ...])
 ```
 
 Yielding in TensorBoard:

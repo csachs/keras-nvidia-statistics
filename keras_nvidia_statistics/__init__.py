@@ -3,6 +3,7 @@ try:
 except ImportError:
     nvml = None
 
+import numpy as np
 from keras.callbacks import Callback
 
 
@@ -63,6 +64,7 @@ class NvidiaDeviceStatistics(Callback):
     def on_epoch_end(self, epoch, logs=None):
         for item in self.report:
             try:
+                suffix = handle = None
                 for n, handle in enumerate(self.deviceHandles):
                     if len(self.deviceHandles) == 1 and not self.always_suffix:
                         suffix = ''

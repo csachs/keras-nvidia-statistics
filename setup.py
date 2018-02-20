@@ -15,7 +15,7 @@ setup(
     author_email='sachs.christian@gmail.com',
     url='',
     packages=find_packages(),
-    requires=['keras', 'py3nvml'],
+    requires=['keras', 'numpy', 'py3nvml'],
     license='BSD',
     classifiers=[
         'Development Status :: 4 - Beta',
