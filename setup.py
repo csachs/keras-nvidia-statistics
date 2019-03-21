@@ -8,14 +8,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='keras_nvidia_statistics',
-    version='0.0.1-1',
+    version='0.0.1-2',
     description='Generate device statistics (such as utilization, temperature, …) via a keras callback',
     long_description='',
     author='Christian C. Sachs',
     author_email='sachs.christian@gmail.com',
     url='',
     packages=find_packages(),
-    requires=['keras', 'numpy', 'py3nvml'],
+    requires=['numpy', 'py3nvml'],
     license='BSD',
     classifiers=[
         'Development Status :: 4 - Beta',

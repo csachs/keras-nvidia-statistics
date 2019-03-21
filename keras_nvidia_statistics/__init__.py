@@ -4,7 +4,12 @@ except ImportError:
     nvml = None
 
 import numpy as np
-from keras.callbacks import Callback
+import os
+
+if 'USE_TENSORFLOW_KERAS' in os.environ and os.environ['USE_TENSORFLOW_KERAS'] == '1':
+    from tensorflow.keras.callbacks import Callback
+else:
+    from keras.callbacks import Callback
 
 
 def _bytes_to_megabytes(b_):
