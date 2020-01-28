@@ -30,7 +30,7 @@ class NvidiaDeviceStatistics(Callback):
         utilization_memory=lambda handle: nvml.nvmlDeviceGetUtilizationRates(handle).memory,
     )
 
-    def __init__(self, report=None, devices=None, quiet=False, always_suffix=False, output=print):
+    def __init__(self, report=None, devices=None, quiet=False, always_suffix=False, output=print, verbose_once=True):
         super(self.__class__, self).__init__()
 
         self.output = output
@@ -61,6 +61,7 @@ class NvidiaDeviceStatistics(Callback):
         elif report == 'all':
             report = list(self.reportable_values.keys())
 
+        self.verbose_once = verbose_once
         self.report = report
         self.always_suffix = always_suffix
 
@@ -81,3 +82,8 @@ class NvidiaDeviceStatistics(Callback):
                     logs[item + suffix] = np.float32(self.reportable_values[item](handle))
             except nvml.NVMLError as err:
                 self.output("Error trying to read out value from NVML: %r" % (err,))
+        if self.verbose_once:
+            self.output("Current status for device #% 2d (%s): %r" % (n, nvml.nvmlDeviceGetName(handle), {
+                what: float(call(handle)) for what, call in self.reportable_values.items()
+            }))
+            self.verbose_once = False  # only print once
