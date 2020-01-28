@@ -30,12 +30,14 @@ class NvidiaDeviceStatistics(Callback):
         utilization_memory=lambda handle: nvml.nvmlDeviceGetUtilizationRates(handle).memory,
     )
 
-    def __init__(self, report=None, devices=None, quiet=False, always_suffix=False):
+    def __init__(self, report=None, devices=None, quiet=False, always_suffix=False, output=print):
         super(self.__class__, self).__init__()
+
+        self.output = output
 
         if nvml is None:
             if not quiet:
-                print("Could not load py3nvml, cannot report any nvidia device statistics.")
+                self.output("Could not load py3nvml, cannot report any nvidia device statistics.")
             report = []
         else:
             nvml.nvmlInit()
@@ -52,7 +54,7 @@ class NvidiaDeviceStatistics(Callback):
 
             if not quiet:
                 for n, handle in enumerate(self.deviceHandles):
-                    print("Collecting statistics for device #% 2d: %s" % (n, nvml.nvmlDeviceGetName(handle)))
+                    self.output("Collecting statistics for device #% 2d: %s" % (n, nvml.nvmlDeviceGetName(handle)))
 
         if report is None:
             report = ['temperature', 'utilization_gpu']
@@ -78,4 +80,4 @@ class NvidiaDeviceStatistics(Callback):
 
                     logs[item + suffix] = np.float32(self.reportable_values[item](handle))
             except nvml.NVMLError as err:
-                print("Error trying to read out value from NVML: %r" % (err,))
+                self.output("Error trying to read out value from NVML: %r" % (err,))
