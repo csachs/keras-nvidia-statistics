@@ -77,7 +77,7 @@ class NvidiaDeviceStatistics(Callback):
                     if len(self.deviceHandles) == 1 and not self.always_suffix:
                         suffix = ''
                     else:
-                        suffix = '%02d' % (n,)
+                        suffix = '_%02d' % (n,)  # TODO: this will not work nicely if more than 100 GPUs are in one sys
 
                     logs[item + suffix] = np.float32(self.reportable_values[item](handle))
             except nvml.NVMLError as err:
