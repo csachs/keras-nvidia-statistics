@@ -76,6 +76,6 @@ class NvidiaDeviceStatistics(Callback):
                     else:
                         suffix = '%02d' % (n,)
 
-                logs[item + suffix] = np.float32(self.reportable_values[item](handle))
+                    logs[item + suffix] = np.float32(self.reportable_values[item](handle))
             except nvml.NVMLError as err:
                 print("Error trying to read out value from NVML: %r" % (err,))
