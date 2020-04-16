@@ -6,10 +6,16 @@ except ImportError:
 import numpy as np
 import os
 
-if 'USE_TENSORFLOW_KERAS' in os.environ and os.environ['USE_TENSORFLOW_KERAS'] == '1':
-    from tensorflow.keras.callbacks import Callback
-else:
-    from keras.callbacks import Callback
+try:
+    if 'USE_TENSORFLOW_KERAS' in os.environ and os.environ['USE_TENSORFLOW_KERAS'] == '1':
+        from tensorflow.keras.callbacks import Callback
+    else:
+        from keras.callbacks import Callback
+except ImportError:
+    class Callback:
+        def __init__(self):
+            raise RuntimeError(self.__class__.__name__ + ' needs either tensorflow or keras installed. '
+                                                         '(Choose via USE_TENSORFLOW_KERAS=1/0 environment variable)')
 
 
 def _bytes_to_megabytes(b_):
@@ -24,7 +30,7 @@ class NvidiaDeviceStatistics(Callback):
             nvml.nvmlDeviceGetMemoryInfo(handle).total - nvml.nvmlDeviceGetMemoryInfo(handle).used
         ),
         temperature=lambda handle: nvml.nvmlDeviceGetTemperature(handle, nvml.NVML_TEMPERATURE_GPU),
-        power_state=nvml.nvmlDeviceGetPowerState,
+        power_state=lambda handle: nvml.nvmlDeviceGetPowerState(handle),
         power_draw=lambda handle: nvml.nvmlDeviceGetPowerUsage(handle) / 1000.0,
         utilization_gpu=lambda handle: nvml.nvmlDeviceGetUtilizationRates(handle).gpu,
         utilization_memory=lambda handle: nvml.nvmlDeviceGetUtilizationRates(handle).memory,
