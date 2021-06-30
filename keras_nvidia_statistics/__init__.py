@@ -38,16 +38,22 @@ class NvidiaDeviceStatistics(Callback):
 
     def __init__(self, report=None, devices=None, quiet=False, always_suffix=False, output=print, verbose_once=True):
         super(self.__class__, self).__init__()
+        global nvml
 
         self.output = output
+
+        if nvml is not None:
+            try:
+                nvml.nvmlInit()
+            except (OSError, nvml.NVMLError_LibraryNotFound):
+                # the python library might be installed, but not the drivers...
+                nvml = None
 
         if nvml is None:
             if not quiet:
                 self.output("Could not load py3nvml, cannot report any nvidia device statistics.")
             report = []
         else:
-            nvml.nvmlInit()
-
             device_count = nvml.nvmlDeviceGetCount()
 
             if devices is None:
@@ -73,7 +79,10 @@ class NvidiaDeviceStatistics(Callback):
 
     def __del__(self):
         if nvml:
-            nvml.nvmlShutdown()
+            try:
+                nvml.nvmlShutdown()
+            except Exception:
+                pass
 
     def on_epoch_end(self, epoch, logs=None):
         for item in self.report:
@@ -88,7 +97,7 @@ class NvidiaDeviceStatistics(Callback):
                     logs[item + suffix] = np.float32(self.reportable_values[item](handle))
             except nvml.NVMLError as err:
                 self.output("Error trying to read out value from NVML: %r" % (err,))
-        if self.verbose_once:
+        if self.report and self.verbose_once:
             self.output("Current status for device #% 2d (%s): %r" % (n, nvml.nvmlDeviceGetName(handle), {
                 what: float(call(handle)) for what, call in self.reportable_values.items()
             }))
